@@ -23,6 +23,22 @@ function TickIcon() {
   );
 }
 
+function CheckGlyph() {
+  return (
+    <svg className="glyph" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+      <path d="M3 8.5l3 3L13 4.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ForkGlyph() {
+  return (
+    <svg className="glyph" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+      <path d="M4 2v12M4 8c0-3 3-3 8-3M10 2l3 3-3 3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function ArrowIcon({ direction }: { direction: "up" | "down" }) {
   return (
     <svg className="icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" style={{ transform: direction === "down" ? "rotate(180deg)" : undefined }}>
@@ -110,7 +126,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
           <div className="step-meta">
             {mode === "check" ? (
               <div className="inline-form">
-                <label htmlFor={`check-${step.id}`}>Check: what must be true before moving on</label>
+                <label htmlFor={`check-${step.id}`}>Done when: what must be true before moving on</label>
                 <div className="row">
                   <input id={`check-${step.id}`} type="text" value={check} onChange={(e) => setCheck(e.target.value)} placeholder="e.g. The record saves without errors" />
                   <button className="primary small" onClick={() => { store.setCheck(step.id, check); setMode("view"); }}>Save</button>
@@ -121,7 +137,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
             ) : (
               step.check && (
                 <div className="meta-line">
-                  <span className="tag check">Check</span>
+                  <span className="tag check"><CheckGlyph />Done when</span>
                   <span>{step.check}</span>
                 </div>
               )
@@ -151,7 +167,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
             ) : (
               step.branch && (
                 <div className="meta-line">
-                  <span className="tag branch">Condition</span>
+                  <span className="tag branch"><ForkGlyph />Condition</span>
                   <span>
                     <span className="kw">If</span> {step.branch.condition}, <span className="kw">go to</span>{" "}
                     {targetStep ? <strong>step {targetStep.order}: {targetStep.title}</strong> : <em>a missing step</em>}

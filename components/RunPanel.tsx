@@ -65,7 +65,12 @@ function CurrentStep({ step, runbook, blockers }: { step: Step; runbook: Runbook
       <p>{step.instruction}</p>
       {step.check && (
         <p className="check-line">
-          <span className="tag check">Check</span>
+          <span className="tag check">
+            <svg className="glyph" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+              <path d="M3 8.5l3 3L13 4.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Done when
+          </span>
           {step.check}
         </p>
       )}
@@ -92,7 +97,7 @@ function CurrentStep({ step, runbook, blockers }: { step: Step; runbook: Runbook
               Condition holds, go to step {target.order}
             </button>
           )}
-          <button onClick={() => setReporting(true)}>Report a blocker</button>
+          <button className="blocker-button" onClick={() => setReporting(true)}>Report a blocker</button>
           <button className="link" onClick={() => store.abandonRun("person")}>Abandon run</button>
         </div>
       ) : (
@@ -202,7 +207,7 @@ function BlockerItem({ blocker, step }: { blocker: Blocker; step: Step }) {
             <textarea id={`fix-instruction-${blocker.id}`} value={instruction} onChange={(e) => setInstruction(e.target.value)} />
           </div>
           <div className="field">
-            <label htmlFor={`fix-check-${blocker.id}`}>Check (leave empty for none)</label>
+            <label htmlFor={`fix-check-${blocker.id}`}>Done when (leave empty for none)</label>
             <input id={`fix-check-${blocker.id}`} type="text" value={check} onChange={(e) => setCheck(e.target.value)} />
           </div>
           <div className="field">

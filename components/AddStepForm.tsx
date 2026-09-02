@@ -41,7 +41,7 @@ export function AddStepForm({ stepCount }: { stepCount: number }) {
         <textarea id="new-instruction" value={instruction} onChange={(e) => setInstruction(e.target.value)} />
       </div>
       <div className="field">
-        <label htmlFor="new-check">Check (optional)</label>
+        <label htmlFor="new-check">Done when (optional)</label>
         <input id="new-check" type="text" value={check} onChange={(e) => setCheck(e.target.value)} />
       </div>
       <div className="field">
