@@ -22,7 +22,7 @@ export function RunbookHeader({ runbook, all, locked }: { runbook: Runbook; all:
 
   return (
     <div className="runbook-head">
-      <div className="edit-row" style={{ marginBottom: 10 }}>
+      <div className="edit-row toolbar">
         <label htmlFor="runbook-select" style={{ margin: 0 }}>Runbook</label>
         <select
           id="runbook-select"
@@ -61,6 +61,10 @@ export function RunbookHeader({ runbook, all, locked }: { runbook: Runbook; all:
         <>
           <h2 id="runbook-title">{runbook.title}</h2>
           <p>{runbook.description}</p>
+          <p className="explainer">
+            Each step can carry a check, which confirms the step worked, and a condition, which sends the run to a
+            different step when something is already true.
+          </p>
         </>
       )}
     </div>

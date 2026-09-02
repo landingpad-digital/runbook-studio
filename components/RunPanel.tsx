@@ -71,7 +71,7 @@ function CurrentStep({ step, runbook, blockers }: { step: Step; runbook: Runbook
       )}
       {step.branch && target && (
         <p className="check-line">
-          <span className="tag branch">Branch</span>
+          <span className="tag branch">Condition</span>
           If {step.branch.condition}, go to step {target.order}
         </p>
       )}
@@ -89,7 +89,7 @@ function CurrentStep({ step, runbook, blockers }: { step: Step; runbook: Runbook
           </button>
           {step.branch && target && (
             <button onClick={() => store.advanceRun({ branchTaken: true }, "person")}>
-              Take branch to step {target.order}
+              Condition holds, go to step {target.order}
             </button>
           )}
           <button onClick={() => setReporting(true)}>Report a blocker</button>

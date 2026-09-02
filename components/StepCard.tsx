@@ -44,6 +44,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
   if (isFlash) classes.push(highlight!.source === "agent" ? "flash-agent" : "flash-person");
   if (runState) classes.push(runState);
   if (blockers.length) classes.push("blocked");
+  if (mode !== "view") classes.push("editing");
 
   const targetStep = step.branch ? runbook.steps.find((s) => s.id === step.branch!.targetStepId) : undefined;
   const others = runbook.steps.filter((s) => s.id !== step.id);
@@ -113,6 +114,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
                 <div className="row">
                   <input id={`check-${step.id}`} type="text" value={check} onChange={(e) => setCheck(e.target.value)} placeholder="e.g. The record saves without errors" />
                   <button className="primary small" onClick={() => { store.setCheck(step.id, check); setMode("view"); }}>Save</button>
+                  {step.check && <button className="small" onClick={() => { store.setCheck(step.id, null); setMode("view"); }}>Remove check</button>}
                   <button className="small" onClick={() => setMode("view")}>Cancel</button>
                 </div>
               </div>
@@ -127,7 +129,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
 
             {mode === "branch" ? (
               <div className="inline-form">
-                <label htmlFor={`branch-cond-${step.id}`}>Branch: if a condition holds, jump to another step</label>
+                <label htmlFor={`branch-cond-${step.id}`}>Condition: if this is already true, send the run to another step</label>
                 <div className="row">
                   <input id={`branch-cond-${step.id}`} type="text" value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="If this is true" />
                   <select aria-label="Target step" value={target} onChange={(e) => setTarget(e.target.value)}>
@@ -142,15 +144,16 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
                   >
                     Save
                   </button>
+                  {step.branch && <button className="small" onClick={() => { store.setBranch(step.id, null); setMode("view"); }}>Remove condition</button>}
                   <button className="small" onClick={() => setMode("view")}>Cancel</button>
                 </div>
               </div>
             ) : (
               step.branch && (
                 <div className="meta-line">
-                  <span className="tag branch">Branch</span>
+                  <span className="tag branch">Condition</span>
                   <span>
-                    If {step.branch.condition}, go to{" "}
+                    <span className="kw">If</span> {step.branch.condition}, <span className="kw">go to</span>{" "}
                     {targetStep ? <strong>step {targetStep.order}: {targetStep.title}</strong> : <em>a missing step</em>}
                   </span>
                 </div>
@@ -172,9 +175,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
             <button className="small icon-button" aria-label={`Move step ${step.order} down`} title="Move down" disabled={step.order === runbook.steps.length} onClick={() => store.moveStep(step.id, step.order + 1)}><ArrowIcon direction="down" /></button>
             <button className="small" onClick={() => open("edit")}>Edit</button>
             <button className="small" onClick={() => open("check")}>{step.check ? "Edit check" : "Add check"}</button>
-            {step.check && <button className="small" onClick={() => store.setCheck(step.id, null)}>Remove check</button>}
-            <button className="small" disabled={others.length === 0} onClick={() => open("branch")}>{step.branch ? "Edit branch" : "Add branch"}</button>
-            {step.branch && <button className="small" onClick={() => store.setBranch(step.id, null)}>Remove branch</button>}
+            <button className="small" disabled={others.length === 0} onClick={() => open("branch")}>{step.branch ? "Edit condition" : "Add condition"}</button>
             <button className="small danger push-right" onClick={() => store.deleteStep(step.id)}>Delete</button>
           </div>
         )}
