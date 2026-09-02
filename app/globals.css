@@ -357,3 +357,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   padding: 8px 12px; background: var(--ink); color: #fff; border-radius: 6px; text-decoration: none;
 }
 .skip-link:focus { top: 8px; }
+
+/* Credit footer */
+.credit { margin-top: var(--s7); padding-top: var(--s2); font-size: 13px; color: #5c5b57; }
+.credit p { margin: 0; }
+.credit a { color: #4a5d6e; text-decoration: underline; text-underline-offset: 2px; }
+.credit a:hover { color: var(--accent); }

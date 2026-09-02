@@ -22,6 +22,23 @@ export default function Home() {
         <RunbookEditor />
         <Sidebar />
       </div>
+      <footer className="credit">
+        <p>
+          Runbook Studio. Built by{" "}
+          <a href="https://landingpad.digital/?utm_source=runbook-studio&utm_medium=referral&utm_campaign=webmcp-challenge" target="_blank" rel="noopener noreferrer">
+            Landing Pad Digital
+          </a>
+          . Open source,{" "}
+          <a href="https://github.com/landingpad-digital/runbook-studio/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
+            MIT licensed
+          </a>
+          .{" "}
+          <a href="https://github.com/landingpad-digital/runbook-studio" target="_blank" rel="noopener noreferrer">
+            View the source
+          </a>
+          .
+        </p>
+      </footer>
     </main>
   );
 }
