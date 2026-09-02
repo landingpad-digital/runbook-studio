@@ -20,6 +20,8 @@ type Args = Record<string, unknown>;
 
 export interface ToolDefinition {
   name: string;
+  /** Short human-readable label, shown by tool inspectors. */
+  title: string;
   description: string;
   inputSchema: object;
   annotations: { readOnlyHint: boolean; untrustedContentHint: boolean };
@@ -82,6 +84,7 @@ const NO_STEP =
 export const toolDefinitions: ToolDefinition[] = [
   {
     name: "list_steps",
+    title: "List the steps",
     description:
       "Read the runbook the person currently has open: its title, description and every step in order. " +
       "Returns step ids, positions, titles and whether each has a check or a branch. " +
@@ -111,6 +114,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "get_step",
+    title: "Read a step",
     description:
       "Read one step of the open runbook in full: title, instruction, check and branch. " +
       "Use it when you need the exact wording of a step before rewriting it or judging whether reality matched it.",
@@ -131,6 +135,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "add_step",
+    title: "Add a step",
     description:
       "Insert a new step into the open runbook. Give a short imperative title and a clear instruction a person can follow. " +
       "Optionally add a check (what must be true before moving on) and a position; without a position the step goes at the end. " +
@@ -156,6 +161,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "update_step",
+    title: "Rewrite a step",
     description:
       "Rewrite the title or instruction of an existing step, or both. Use this to correct wording, add detail, " +
       "or bring a step back in line with how the work is really done. Checks and branches are left untouched; " +
@@ -183,6 +189,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "reorder_steps",
+    title: "Move a step",
     description:
       "Move one step to a new position in the open runbook. Every step renumbers afterwards, so read list_steps again " +
       "before referring to positions. Branch targets follow the step they point at.",
@@ -208,6 +215,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "delete_step",
+    title: "Delete a step",
     description:
       "Remove a step from the open runbook permanently. Any branch that pointed at it is cleared. " +
       "Prefer update_step when the step is merely wrong; delete only when it no longer belongs in the procedure.",
@@ -233,6 +241,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "set_check",
+    title: "Set a check",
     description:
       "Attach a verification check to a step, replace its existing check, or clear it. A check is a plain-language " +
       "condition that must be true before moving to the next step, such as \"The invoice total matches the order\". " +
@@ -258,6 +267,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "set_branch",
+    title: "Set a condition",
     description:
       "Attach a conditional branch to a step, replace it, or clear it. A branch says: if this condition holds when the " +
       "step is reached, jump to the target step instead of continuing. Use it for exceptions such as an existing record " +
@@ -290,6 +300,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "start_run",
+    title: "Start a run",
     description:
       "Begin running the open runbook from step 1 and return that step in full. While a run is active the page shows " +
       "which step is current. Use advance_run to move on and report_blocker when reality does not match a step. " +
@@ -306,6 +317,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "advance_run",
+    title: "Advance the run",
     description:
       "Mark the current step of the active run as done and move to the next one, returning it in full. If the current " +
       "step has a branch and its condition held, pass branchTaken=true to jump to the branch target instead. " +
@@ -335,6 +347,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "report_blocker",
+    title: "Report a blocker",
     description:
       "Record that reality did not match a step during a run: a missing screen, a renamed option, a check that cannot " +
       "pass. Say plainly what was found instead. The blocker is pinned to that step on the page so it can be turned " +
@@ -363,6 +376,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "list_blockers",
+    title: "List blockers",
     description:
       "Read the blockers recorded against steps of the open runbook that have not yet been fixed. Each includes the " +
       "step it refers to and the note about what was found. Use the blockerId with apply_blocker_fix.",
@@ -394,6 +408,7 @@ export const toolDefinitions: ToolDefinition[] = [
   },
   {
     name: "apply_blocker_fix",
+    title: "Apply a blocker fix",
     description:
       "Turn a blocker into an amendment: rewrite the step the blocker refers to so it matches what was actually found, " +
       "optionally update its check, and mark the blocker resolved. Give a short resolution note saying what changed. " +
@@ -469,6 +484,7 @@ export async function registerRunbookTools(mc: WebMCP.ModelContext, signal: Abor
     await mc.registerTool(
       {
         name: def.name,
+        title: def.title,
         description: def.description,
         inputSchema: def.inputSchema,
         annotations: def.annotations,
