@@ -160,12 +160,20 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
   margin-right: 6px;
   vertical-align: 1px;
 }
-.tag { display: inline-flex; align-items: center; gap: 5px; padding: 0; margin-right: var(--s1); letter-spacing: 0.09em; font-size: 11px; font-weight: 700; color: #4a4946; background: none; border: none; min-width: 96px; }
-.tag .glyph { flex: 0 0 auto; }
-.tag.check { color: #2f6b3c; }
-.tag.branch { color: #2c5a7f; }
+.tag {
+  display: inline-flex; align-items: center; justify-content: flex-start; gap: 5px;
+  padding: 2px 9px; margin-right: var(--s2);
+  letter-spacing: 0.08em; font-size: 11px; font-weight: 700; line-height: 1.5;
+  border-radius: 999px; border: none;
+  min-width: 100px;
+  color: #fff;
+}
+.tag .glyph { flex: 0 0 auto; width: 11px; height: 11px; }
+/* Desaturated a step from the accent colours; white text measures 4.5:1 or better on both. */
+.tag.check { background: #3a7a4d; }
+.tag.branch { background: #3b6e93; }
 .tag.agent { background: var(--agent-soft); color: var(--agent); padding: 1px 6px; }
-.tag.blocker { background: #fbe6e6; color: var(--danger); padding: 2px 8px; font-size: 11px; letter-spacing: 0.06em; min-width: 0; }
+.tag.blocker { background: var(--danger); color: #fff; padding: 2px 9px; font-size: 11px; letter-spacing: 0.08em; min-width: 100px; }
 .step-actions {
   display: flex; flex-wrap: wrap; gap: var(--s2);
   margin-top: var(--s2);
