@@ -1,6 +1,7 @@
 import { RunbookEditor } from "@/components/RunbookEditor";
 import { WebMcpProvider } from "@/components/WebMcpProvider";
 import { WebMcpStatusPill } from "@/components/WebMcpStatusPill";
+import { HarnessPanel } from "@/components/HarnessPanel";
 
 export default function Home() {
   return (
@@ -17,11 +18,8 @@ export default function Home() {
       </header>
       <div className="layout">
         <RunbookEditor />
-        <aside>
-          <div className="panel">
-            <h2>Agent</h2>
-            <p className="muted small-text">The agent harness and run controls arrive in the next tasks.</p>
-          </div>
+        <aside className="sidebar">
+          <HarnessPanel />
         </aside>
       </div>
     </main>
