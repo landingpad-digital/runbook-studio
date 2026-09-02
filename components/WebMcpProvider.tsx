@@ -16,6 +16,14 @@ export function WebMcpProvider() {
     let cancelled = false;
 
     (async () => {
+      if (!window.isSecureContext) {
+        setWebMcpStatus({
+          provider: "none",
+          toolNames: [],
+          error: "WebMCP needs a secure context. Open this app over HTTPS or on localhost.",
+        });
+        return;
+      }
       let provider: "native" | "polyfill" = "native";
       if (!document.modelContext) {
         const { initializeWebMCPPolyfill } = await import("@mcp-b/webmcp-polyfill");
