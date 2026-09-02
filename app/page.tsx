@@ -1,7 +1,7 @@
 import { RunbookEditor } from "@/components/RunbookEditor";
 import { WebMcpProvider } from "@/components/WebMcpProvider";
 import { WebMcpStatusPill } from "@/components/WebMcpStatusPill";
-import { HarnessPanel } from "@/components/HarnessPanel";
+import { Sidebar } from "@/components/Sidebar";
 
 export default function Home() {
   return (
@@ -18,9 +18,7 @@ export default function Home() {
       </header>
       <div className="layout">
         <RunbookEditor />
-        <aside className="sidebar">
-          <HarnessPanel />
-        </aside>
+        <Sidebar />
       </div>
     </main>
   );

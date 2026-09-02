@@ -1,0 +1,19 @@
+name: runbook-studio
+
+services:
+  runbook-studio:
+    build: .
+    image: runbook-studio:latest
+    container_name: runbook-studio
+    environment:
+      - VIRTUAL_HOST=runbook.landingpad.digital
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=runbook.landingpad.digital
+      - LETSENCRYPT_EMAIL=dev@landingpad.digital
+    networks:
+      - nextcloud-net
+    restart: unless-stopped
+
+networks:
+  nextcloud-net:
+    external: true
