@@ -1,19 +1,77 @@
+/* ------------------------------------------------------------------
+   Design tokens
+   Every colour used in the app is declared here. Rules below reference
+   tokens only, so a palette change is a change to this block alone.
+   ------------------------------------------------------------------ */
 :root {
+  /* Surfaces */
   --bg: #f6f5f1;
   --panel: #ffffff;
+  --surface-2: #f0efe9;        /* code, pre, run summary */
+  --surface-hover: #f4f2ec;    /* card hover and focus-within */
+  --surface-skipped: #faf9f5;
+
+  /* Text */
   --ink: #1d1d1b;
+  --ink-soft: #2f2f2c;         /* step instructions */
+  --ink-meta: #363532;         /* check and condition text */
+  --ink-chip: #33322f;         /* action chip labels */
   --muted: #6b6a66;
+  --muted-strong: #5c5b57;     /* explainer, credit line */
+  --muted-disabled: #8a8985;
+  --on-dark: #ffffff;          /* text reversed out of a filled shape */
+
+  /* Lines */
   --line: #dedcd5;
+
+  /* Accent (person, current step, links) */
   --accent: #1f5f8b;
-  --accent-ink: #ffffff;
+  --accent-rgb: 31, 95, 139;
+  --accent-ink: var(--on-dark);
+  --accent-soft: #e4f0f9;      /* person flash, current-step box */
+  --accent-surface: #f3f8fc;   /* current card */
+  --accent-surface-hover: #eef5fb;
+  --accent-deep: #143d5a;      /* person change strip text */
+  --link-muted: #4a5d6e;       /* credit links */
+  --focus: #005fcc;
+
+  /* Agent */
   --agent: #b4650f;
+  --agent-rgb: 180, 101, 15;
   --agent-soft: #fff1df;
-  --person-soft: #e4f0f9;
+  --agent-deep: #6b3b05;       /* agent change strip text */
+
+  /* Danger (blockers, delete) */
   --danger: #a12f2f;
+  --danger-text: #8f2a2a;
+  --danger-soft: #fbe6e6;
+  --danger-chip: #f3ebe8;
+  --danger-surface: #fff7f7;   /* blocked card */
+  --danger-surface-hover: #fff1f1;
+
+  /* Success (done, checks) */
   --ok: #2b7a3b;
   --ok-soft: #e7f5ea;
+
+  /* Annotation pills, desaturated a step from the accents so white text
+     measures 4.5:1 or better on both. */
+  --pill-check: #3a7a4d;
+  --pill-condition: #3b6e93;
+
+  /* Action chips */
+  --chip: #ebe9e2;
+  --chip-hover: #dcd9cf;
+  --chip-disabled: #f0eee8;
+
+  /* Shadow */
+  --shadow: rgba(0, 0, 0, 0.18);
+
+  /* Shape and type */
   --radius: 8px;
+  --radius-sm: 6px;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Spacing, 4px base */
   --s1: 4px;
   --s2: 8px;
   --s3: 12px;
@@ -25,6 +83,9 @@
   --measure: 70ch;
 }
 
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
 * { box-sizing: border-box; }
 
 html, body {
@@ -41,7 +102,7 @@ button {
   cursor: pointer;
   border: 1px solid var(--line);
   background: var(--panel);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 6px 12px;
 }
 button:hover { border-color: var(--ink); }
@@ -56,13 +117,29 @@ input[type="text"], textarea, select {
   width: 100%;
   padding: 7px 9px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--panel);
 }
 textarea { min-height: 72px; resize: vertical; }
-label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+label { display: block; font-size: 13px; color: var(--muted); margin-bottom: var(--s1); }
 .field { margin-bottom: 10px; }
 
+code { font-family: var(--mono); font-size: 13px; background: var(--surface-2); padding: 1px 4px; border-radius: 3px; }
+pre {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  background: var(--surface-2);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ------------------------------------------------------------------
+   Page frame
+   ------------------------------------------------------------------ */
 .app {
   max-width: 1240px;
   margin: 0 auto;
@@ -73,8 +150,8 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 16px;
+  gap: var(--s4);
+  padding-bottom: var(--s4);
   border-bottom: 1px solid var(--line);
   margin-bottom: 20px;
   flex-wrap: wrap;
@@ -82,7 +159,7 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
 .brand { display: flex; align-items: baseline; gap: 10px; }
 .brand h1 { font-size: 20px; margin: 0; }
 .brand span { color: var(--muted); font-size: 13px; }
-.topbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.topbar-actions { display: flex; gap: var(--s2); align-items: center; flex-wrap: wrap; }
 .status-pill {
   font-size: 12px;
   padding: 3px 9px;
@@ -113,13 +190,19 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
 .muted { color: var(--muted); }
 .small-text { font-size: 13px; }
 
+/* ------------------------------------------------------------------
+   Runbook header
+   ------------------------------------------------------------------ */
 .runbook-head { margin-bottom: var(--s6); }
 .runbook-head h2 { font-size: 22px; margin: 0 0 var(--s2); }
 .runbook-head p { margin: 0; color: var(--muted); max-width: var(--measure); }
-.runbook-head .explainer { margin-top: var(--s3); font-size: 13.5px; color: #5c5b57; }
+.runbook-head .explainer { margin-top: var(--s3); font-size: 13.5px; color: var(--muted-strong); }
 .runbook-head .edit-row { display: flex; gap: var(--s2); align-items: center; margin-top: 6px; }
 .runbook-head .toolbar { margin-bottom: var(--s6); }
 
+/* ------------------------------------------------------------------
+   Step cards
+   ------------------------------------------------------------------ */
 .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s5); }
 
 .step {
@@ -128,7 +211,6 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
   gap: var(--s3);
   padding: 20px 20px 10px;
   border: 1px solid transparent;
-  border-left-width: 4px;
   border-radius: var(--radius);
   background: var(--panel);
   transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
@@ -140,45 +222,40 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
 .step.done .step-num .num { color: var(--ok); }
 .state-mark { display: inline-flex; color: var(--ok); }
 .icon { display: block; }
+
 .step-body { max-width: var(--measure); }
 .step-body h3 { margin: 0 0 var(--s2); font-size: 16px; }
 .step-body p { margin: 0; white-space: pre-wrap; }
-.step-body p.instruction { color: #2f2f2c; }
-.step-meta { margin-top: var(--s3); display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #363532; }
+.step-body p.instruction { color: var(--ink-soft); }
+
+.step-meta { margin-top: var(--s3); display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--ink-meta); }
 .meta-line { display: flex; gap: var(--s2); align-items: baseline; }
 .meta-line .tag { flex: 0 0 auto; }
 .meta-line .kw { color: var(--muted); font-style: italic; }
 .meta-line strong { color: var(--ink); font-weight: 600; }
-.tag {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 1px 6px;
-  border-radius: 4px;
-  margin-right: 6px;
-  vertical-align: 1px;
-}
+
+/* Annotation pills */
 .tag {
   display: inline-flex; align-items: center; justify-content: flex-start; gap: 5px;
   padding: 2px 9px; margin-right: var(--s2);
   letter-spacing: 0.08em; font-size: 11px; font-weight: 700; line-height: 1.5;
+  text-transform: uppercase;
   border-radius: 999px; border: none;
   min-width: 100px;
-  color: #fff;
+  color: var(--on-dark);
 }
 .tag .glyph { flex: 0 0 auto; width: 11px; height: 11px; }
-/* Desaturated a step from the accent colours; white text measures 4.5:1 or better on both. */
-.tag.check { background: #3a7a4d; }
-.tag.branch { background: #3b6e93; }
+.tag.check { background: var(--pill-check); }
+.tag.branch { background: var(--pill-condition); }
 .tag.agent { background: var(--agent-soft); color: var(--agent); padding: 1px 6px; }
-.tag.blocker { background: var(--danger); color: #fff; padding: 2px 9px; font-size: 11px; letter-spacing: 0.08em; min-width: 100px; }
+.tag.blocker { background: var(--danger); }
+
+/* Actions: hidden with opacity only, because visibility or display would
+   drop the buttons from the tab order. Space is reserved so nothing shifts. */
 .step-actions {
   display: flex; flex-wrap: wrap; gap: var(--s2);
   margin-top: var(--s2);
   min-height: 30px;
-  /* Hidden with opacity only: visibility or display would drop the buttons from the tab order. */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
@@ -193,54 +270,60 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
   min-height: 32px;
   padding: 5px 12px;
   font-size: 13.5px;
-  color: #33322f;
-  background: #ebe9e2;
+  color: var(--ink-chip);
+  background: var(--chip);
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 .step-actions button:hover,
-.step-actions button:focus-visible { background: #dcd9cf; color: var(--ink); border-color: transparent; }
-.step-actions button.danger { color: #8f2a2a; background: #f3ebe8; }
+.step-actions button:focus-visible { background: var(--chip-hover); color: var(--ink); border-color: transparent; }
+.step-actions button.danger { color: var(--danger-text); background: var(--danger-chip); }
 .step-actions button.danger:hover,
-.step-actions button.danger:focus-visible { color: #fff; background: var(--danger); }
-.step-actions button:disabled { color: #8a8985; background: #f0eee8; }
+.step-actions button.danger:focus-visible { color: var(--on-dark); background: var(--danger); }
+.step-actions button:disabled { color: var(--muted-disabled); background: var(--chip-disabled); }
 .icon-button { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; padding: 5px 8px; }
-.step:hover,
-.step:focus-within { background: #f4f2ec; border-color: #cfccc3; }
-.step.current:hover, .step.current:focus-within { background: #eef5fb; border-color: var(--accent); }
-.step.blocked:hover, .step.blocked:focus-within { background: #fff1f1; border-color: var(--danger); }
-.step.done:hover, .step.done:focus-within { border-left-color: var(--ok); }
-.step.skipped:hover, .step.skipped:focus-within { background: #f4f2ec; }
 
+/* Card hover and focus: ownership of the revealed actions. State rules below
+   override these so hover is never mistaken for state. */
+.step:hover,
+.step:focus-within { background: var(--surface-hover); border-color: var(--accent); }
+.step.current:hover, .step.current:focus-within { background: var(--accent-surface-hover); border-color: var(--accent); }
+.step.blocked:hover, .step.blocked:focus-within { background: var(--danger-surface-hover); border-color: var(--danger); }
+.step.done:hover, .step.done:focus-within { border-left-color: var(--ok); }
+.step.skipped:hover, .step.skipped:focus-within { background: var(--surface-hover); }
+
+/* Run states: the only things that draw a box */
+.step.current { border-color: var(--accent); background: var(--accent-surface); }
+.step.done { border-left-color: var(--ok); }
+.step.done .step-body { opacity: 0.72; }
+.step.skipped { border-left-color: var(--line); background: var(--surface-skipped); }
+.step.skipped .step-body { opacity: 0.55; }
+.step.blocked { border-color: var(--danger); background: var(--danger-surface); }
+
+/* Change indication: the loudest transient element on the page */
 .step.flash-agent {
   background: var(--agent-soft);
   border-color: var(--agent);
-  box-shadow: 0 0 0 4px rgba(180, 101, 15, 0.28);
+  box-shadow: 0 0 0 4px rgba(var(--agent-rgb), 0.28);
   animation: flash-agent 2.6s ease-out;
 }
 .step.flash-person {
-  background: var(--person-soft);
+  background: var(--accent-soft);
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(31, 95, 139, 0.22);
+  box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.22);
   animation: flash-person 2.6s ease-out;
 }
 @keyframes flash-agent {
-  0% { box-shadow: 0 0 0 0 rgba(180, 101, 15, 0.9); }
-  35% { box-shadow: 0 0 0 10px rgba(180, 101, 15, 0.25); }
-  100% { box-shadow: 0 0 0 4px rgba(180, 101, 15, 0.28); }
+  0% { box-shadow: 0 0 0 0 rgba(var(--agent-rgb), 0.9); }
+  35% { box-shadow: 0 0 0 10px rgba(var(--agent-rgb), 0.25); }
+  100% { box-shadow: 0 0 0 4px rgba(var(--agent-rgb), 0.28); }
 }
 @keyframes flash-person {
-  0% { box-shadow: 0 0 0 0 rgba(31, 95, 139, 0.9); }
-  35% { box-shadow: 0 0 0 10px rgba(31, 95, 139, 0.2); }
-  100% { box-shadow: 0 0 0 4px rgba(31, 95, 139, 0.22); }
+  0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0.9); }
+  35% { box-shadow: 0 0 0 10px rgba(var(--accent-rgb), 0.2); }
+  100% { box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.22); }
 }
-.step.current { border-color: var(--accent); background: #f3f8fc; }
-.step.done { border-left-color: var(--ok); }
-.step.done .step-body { opacity: 0.72; }
-.step.skipped { border-left-color: var(--line); background: #faf9f5; }
-.step.skipped .step-body { opacity: 0.55; }
-.step.blocked { border-color: var(--danger); background: #fff7f7; }
 .change-badge {
   position: absolute;
   top: -12px;
@@ -250,101 +333,93 @@ label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px
   letter-spacing: 0.01em;
   padding: 3px 12px;
   border-radius: 999px;
-  color: #fff;
+  color: var(--on-dark);
   background: var(--agent);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px var(--shadow);
 }
 .change-badge.person { background: var(--accent); }
 .change-strip {
   margin: 0 0 var(--s4);
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 600;
   border-left: 5px solid var(--agent);
   background: var(--agent-soft);
-  color: #6b3b05;
+  color: var(--agent-deep);
 }
-.change-strip.person { border-left-color: var(--accent); background: var(--person-soft); color: #143d5a; }
-
-.step-edit { display: flex; flex-direction: column; gap: 8px; }
-.step-edit .buttons { display: flex; gap: 8px; }
+.change-strip.person { border-left-color: var(--accent); background: var(--accent-soft); color: var(--accent-deep); }
 
 .runbook.pulse { animation: pulse 2s ease-out; border-radius: var(--radius); }
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(180, 101, 15, 0.45); }
-  100% { box-shadow: 0 0 0 14px rgba(180, 101, 15, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(var(--agent-rgb), 0.45); }
+  100% { box-shadow: 0 0 0 14px rgba(var(--agent-rgb), 0); }
 }
 
+/* Editing */
+.step-edit { display: flex; flex-direction: column; gap: var(--s2); }
+.step-edit .buttons { display: flex; gap: var(--s2); }
 .add-step { margin-top: var(--s6); }
 .empty { padding: 20px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--radius); }
-
-.inline-form { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding: 10px; border: 1px dashed var(--line); border-radius: 6px; }
-.inline-form .row { display: flex; gap: 8px; align-items: center; }
+.inline-form { display: flex; flex-direction: column; gap: var(--s2); margin-top: 6px; padding: 10px; border: 1px dashed var(--line); border-radius: var(--radius-sm); }
+.inline-form .row { display: flex; gap: var(--s2); align-items: center; }
 .inline-form .row > * { flex: 1; }
 .inline-form .row > button { flex: 0 0 auto; }
 
-code { font-family: var(--mono); font-size: 13px; background: #f0efe9; padding: 1px 4px; border-radius: 3px; }
-pre {
-  font-family: var(--mono);
-  font-size: 12.5px;
-  background: #f0efe9;
-  padding: 10px;
-  border-radius: 6px;
-  overflow: auto;
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* Harness panel */
-.sidebar { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; }
-.harness-head p { margin: 0 0 12px; }
-.harness-form { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; }
-.tool-description { margin: 0 0 4px; font-size: 14px; }
-.tool-annotations { margin: 0 0 12px; }
-.hint { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); }
-.checkbox-field { display: flex; gap: 8px; align-items: flex-start; }
+/* ------------------------------------------------------------------
+   Sidebar: agent harness
+   ------------------------------------------------------------------ */
+.sidebar { position: sticky; top: var(--s4); align-self: start; max-height: calc(100vh - 32px); overflow: auto; }
+.harness-head p { margin: 0 0 var(--s3); }
+.harness-form { border-top: 1px solid var(--line); padding-top: var(--s3); margin-top: var(--s1); }
+.tool-description { margin: 0 0 var(--s1); font-size: 14px; }
+.tool-annotations { margin: 0 0 var(--s3); }
+.hint { margin: var(--s1) 0 0; font-size: 12.5px; color: var(--muted); }
+.checkbox-field { display: flex; gap: var(--s2); align-items: flex-start; }
 .checkbox-field input { margin-top: 5px; }
 .checkbox-field label { margin: 0; color: var(--ink); }
 .buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .error-text { color: var(--danger); font-size: 13px; }
-.harness-log { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.harness-log { margin-top: var(--s4); border-top: 1px solid var(--line); padding-top: var(--s3); }
 .log-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .log-entry { border-left: 3px solid var(--ok); padding-left: 10px; }
 .log-entry.failed { border-left-color: var(--danger); }
-.log-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 4px; }
-.log-entry details { margin-bottom: 4px; }
+.log-head { display: flex; justify-content: space-between; gap: var(--s2); align-items: baseline; margin-bottom: var(--s1); }
+.log-entry details { margin-bottom: var(--s1); }
 .log-entry summary { cursor: pointer; font-size: 12.5px; color: var(--muted); }
 .log-result { max-height: 260px; }
 
-/* Run panel */
-.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+/* ------------------------------------------------------------------
+   Sidebar: run panel
+   ------------------------------------------------------------------ */
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); margin-bottom: 10px; flex-wrap: wrap; }
 .panel-head h2 { margin: 0; }
 .eyebrow { margin: 0 0 2px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); font-weight: 600; }
-.current-step { border: 1px solid var(--accent); border-left-width: 4px; border-radius: var(--radius); padding: 12px 14px; background: var(--person-soft); }
+.current-step { border: 1px solid var(--accent); border-left-width: 4px; border-radius: var(--radius); padding: 12px 14px; background: var(--accent-soft); }
 .current-step h3 { margin: 0 0 6px; font-size: 17px; }
-.current-step p { margin: 0 0 8px; }
+.current-step p { margin: 0 0 var(--s2); }
 .check-line { font-size: 13.5px; }
 .run-actions { display: flex; flex-direction: column; gap: var(--s2); margin-top: var(--s3); }
 .run-actions button { width: 100%; min-height: 44px; font-size: 15px; }
 .run-actions button.primary { font-weight: 600; font-size: 16px; }
-.run-actions button.blocker-button { border-color: var(--danger); color: var(--danger); background: #fff; font-weight: 600; }
-.run-actions button.blocker-button:hover, .run-actions button.blocker-button:focus-visible { background: #fbe6e6; }
-.run-actions .link { width: auto; align-self: flex-start; margin-top: 4px; font-size: 13px; }
-.run-summary { margin: 0 0 12px; padding: 10px 12px; background: #f0efe9; border-radius: 6px; font-size: 14px; }
+.run-actions button.blocker-button { border-color: var(--danger); color: var(--danger); background: var(--panel); font-weight: 600; }
+.run-actions button.blocker-button:hover, .run-actions button.blocker-button:focus-visible { background: var(--danger-soft); }
+.run-actions .link { width: auto; align-self: flex-start; margin-top: var(--s1); font-size: 13px; }
+.run-summary { margin: 0 0 var(--s3); padding: 10px 12px; background: var(--surface-2); border-radius: var(--radius-sm); font-size: 14px; }
 .run-summary p { margin: 0 0 6px; }
 .run-log { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; }
-.blockers { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
-.blockers h3 { margin: 0 0 4px; font-size: 15px; color: var(--danger); }
-.blocker-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.blockers { margin-top: var(--s4); border-top: 1px solid var(--line); padding-top: var(--s3); }
+.blockers h3 { margin: 0 0 var(--s1); font-size: 15px; color: var(--danger); }
+.blocker-list { list-style: none; margin: var(--s2) 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .blocker-item { border-left: 3px solid var(--danger); padding-left: 10px; }
 .blocker-item p { margin: 0 0 6px; font-size: 14px; }
 .blocker-note { color: var(--ink); }
 
-/* Focus, motion and screen-reader helpers */
-:focus-visible { outline: 3px solid #005fcc; outline-offset: 2px; }
-button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid #005fcc; outline-offset: 2px; }
+/* ------------------------------------------------------------------
+   Focus, motion and screen-reader helpers
+   ------------------------------------------------------------------ */
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
@@ -353,13 +428,15 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 .skip-link {
-  position: absolute; left: 8px; top: -60px; z-index: 50;
-  padding: 8px 12px; background: var(--ink); color: #fff; border-radius: 6px; text-decoration: none;
+  position: absolute; left: var(--s2); top: -60px; z-index: 50;
+  padding: 8px 12px; background: var(--ink); color: var(--on-dark); border-radius: var(--radius-sm); text-decoration: none;
 }
-.skip-link:focus { top: 8px; }
+.skip-link:focus { top: var(--s2); }
 
-/* Credit footer */
-.credit { margin-top: var(--s7); padding-top: var(--s2); font-size: 13px; color: #5c5b57; }
+/* ------------------------------------------------------------------
+   Credit footer
+   ------------------------------------------------------------------ */
+.credit { margin-top: var(--s7); padding-top: var(--s2); font-size: 13px; color: var(--muted-strong); }
 .credit p { margin: 0; }
-.credit a { color: #4a5d6e; text-decoration: underline; text-underline-offset: 2px; }
+.credit a { color: var(--link-muted); text-decoration: underline; text-underline-offset: 2px; }
 .credit a:hover { color: var(--accent); }
