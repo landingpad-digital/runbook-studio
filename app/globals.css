@@ -294,7 +294,8 @@ pre {
 .step.skipped:hover, .step.skipped:focus-within { background: var(--surface-hover); }
 
 /* Run states: the only things that draw a box */
-.step.current { border-width:2px; border-color: var(--accent); background: var(--accent-surface); }
+/* A 1px border plus a 1px inset ring reads as 2px without changing the box size, so nothing shifts when the current step moves. */
+.step.current { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-surface); }
 .step.done { border-left-color: var(--ok); }
 .step.done .step-body { opacity: 0.72; }
 .step.skipped { border-left-color: var(--line); background: var(--surface-skipped); }

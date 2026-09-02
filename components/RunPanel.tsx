@@ -82,7 +82,13 @@ function CurrentStep({ step, runbook, blockers }: { step: Step; runbook: Runbook
       )}
       {blockers.length > 0 && (
         <p className="check-line">
-          <span className="tag blocker">Blocked</span>
+          <span className="tag blocker">
+            <svg className="glyph" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+              <path d="M8 2.5v6.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+              <circle cx="8" cy="12.8" r="1.4" fill="currentColor" />
+            </svg>
+            Blocked
+          </span>
           {blockers[blockers.length - 1].note}
         </p>
       )}

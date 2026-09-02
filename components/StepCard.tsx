@@ -39,6 +39,15 @@ function ForkGlyph() {
   );
 }
 
+function BlockerGlyph() {
+  return (
+    <svg className="glyph" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+      <path d="M8 2.5v6.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+      <circle cx="8" cy="12.8" r="1.4" fill="currentColor" />
+    </svg>
+  );
+}
+
 function ArrowIcon({ direction }: { direction: "up" | "down" }) {
   return (
     <svg className="icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" style={{ transform: direction === "down" ? "rotate(180deg)" : undefined }}>
@@ -178,7 +187,7 @@ export function StepCard({ step, runbook, highlight, locked, runState, blockers 
 
             {blockers.map((b) => (
               <div key={b.id} className="meta-line">
-                <span className="tag blocker">Blocker</span>
+                <span className="tag blocker"><BlockerGlyph />Blocker</span>
                 <span>{b.note}</span>
               </div>
             ))}
