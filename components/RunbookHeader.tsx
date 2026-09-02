@@ -59,7 +59,7 @@ export function RunbookHeader({ runbook, all, locked }: { runbook: Runbook; all:
         </div>
       ) : (
         <>
-          <h2>{runbook.title}</h2>
+          <h2 id="runbook-title">{runbook.title}</h2>
           <p>{runbook.description}</p>
         </>
       )}

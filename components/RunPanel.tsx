@@ -21,7 +21,7 @@ export function RunPanel({ state }: { state: AppState }) {
   return (
     <section className="panel run-panel" aria-labelledby="run-heading">
       <div className="panel-head">
-        <h2 id="run-heading">Run</h2>
+        <h2 id="run-heading" tabIndex={-1}>Run</h2>
         {active && <span className="status-pill on">Step {current?.order ?? "?"} of {runbook.steps.length}, {doneCount} done</span>}
       </div>
 

@@ -13,7 +13,7 @@ import { seedRunbooks } from "./seeds";
 import { newId } from "./id";
 
 const STORAGE_KEY = "runbook-studio:v1";
-const HIGHLIGHT_MS = 1800;
+const HIGHLIGHT_MS = 2600;
 
 type Listener = () => void;
 type Source = Highlight["source"];
@@ -25,6 +25,7 @@ function initialState(): AppState {
     run: null,
     blockers: [],
     highlight: null,
+    announcement: null,
   };
 }
 
@@ -44,8 +45,9 @@ function emit() {
 function persist() {
   if (typeof window === "undefined") return;
   try {
-    const { highlight: _h, ...rest } = state;
+    const { highlight: _h, announcement: _a, ...rest } = state;
     void _h;
+    void _a;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(rest));
   } catch {
     // Storage may be unavailable (private mode, quota). The app still works in memory.
@@ -77,6 +79,7 @@ export function hydrate() {
         run: saved.run ?? null,
         blockers: saved.blockers ?? [],
         highlight: null,
+        announcement: null,
       },
       { persist: false },
     );
@@ -109,9 +112,18 @@ function replaceActive(rb: Runbook) {
   });
 }
 
-function flash(stepId: string, source: Source) {
+function who(source: Source) {
+  return source === "agent" ? "Agent" : "You";
+}
+
+function announce(text: string) {
+  state = { ...state, announcement: { text, n: (state.announcement?.n ?? 0) + 1 } };
+}
+
+function flash(stepId: string, source: Source, message: string) {
   if (highlightTimer) clearTimeout(highlightTimer);
-  state = { ...state, highlight: { stepId, source, at: Date.now() } };
+  state = { ...state, highlight: { stepId, source, at: Date.now(), message } };
+  announce(message);
   emit();
   highlightTimer = setTimeout(() => {
     state = { ...state, highlight: null };
@@ -141,33 +153,38 @@ export function addStep(
 ): Step {
   const { runbook, step } = ops.addStep(activeRunbook(), input);
   replaceActive(runbook);
-  flash(step.id, source);
+  flash(step.id, source, `${who(source)} added step ${step.order}: ${step.title}`);
   return step;
 }
 
 export function updateStep(stepId: string, patch: { title?: string; instruction?: string }, source: Source = "person") {
   replaceActive(ops.updateStep(activeRunbook(), stepId, patch));
-  flash(stepId, source);
+  const s = ops.findStep(activeRunbook(), stepId);
+  flash(stepId, source, `${who(source)} rewrote step ${s?.order ?? ""}: ${s?.title ?? ""}`);
 }
 
 export function moveStep(stepId: string, newPosition: number, source: Source = "person") {
   replaceActive(ops.moveStep(activeRunbook(), stepId, newPosition));
-  flash(stepId, source);
+  const s = ops.findStep(activeRunbook(), stepId);
+  flash(stepId, source, `${who(source)} moved "${s?.title ?? ""}" to position ${s?.order ?? ""}`);
 }
 
 export function deleteStep(stepId: string, source: Source = "person") {
+  const s = ops.findStep(activeRunbook(), stepId);
   replaceActive(ops.deleteStep(activeRunbook(), stepId));
-  if (source === "agent") flashRunbook();
+  flashRunbook(`${who(source)} deleted step ${s?.order ?? ""}: ${s?.title ?? ""}`);
 }
 
 export function setCheck(stepId: string, check: string | null, source: Source = "person") {
   replaceActive(ops.setCheck(activeRunbook(), stepId, check));
-  flash(stepId, source);
+  const s = ops.findStep(activeRunbook(), stepId);
+  flash(stepId, source, `${who(source)} ${check ? "set a check on" : "removed the check from"} step ${s?.order ?? ""}`);
 }
 
 export function setBranch(stepId: string, branch: Branch | null, source: Source = "person") {
   replaceActive(ops.setBranch(activeRunbook(), stepId, branch));
-  flash(stepId, source);
+  const s = ops.findStep(activeRunbook(), stepId);
+  flash(stepId, source, `${who(source)} ${branch ? "set a branch on" : "removed the branch from"} step ${s?.order ?? ""}`);
 }
 
 /** Reset the active runbook back to its seeded content, if it is a seed. */
@@ -191,8 +208,9 @@ let runbookPulse = false;
 export function isRunbookPulsing() {
   return runbookPulse;
 }
-function flashRunbook() {
+function flashRunbook(message: string) {
   runbookPulse = true;
+  announce(message);
   emit();
   if (runbookPulseTimer) clearTimeout(runbookPulseTimer);
   runbookPulseTimer = setTimeout(() => {
@@ -225,7 +243,7 @@ export function startRun(source: Source = "person"): Run {
   run = pushEvent(run, { kind: "started", stepId: first ? first.id : null });
   if (!first) run = { ...run, finishedAt: now() };
   setState({ ...state, run });
-  if (first) flash(first.id, source);
+  if (first) flash(first.id, source, `${who(source)} started a run at step 1: ${first.title}`);
   return run;
 }
 
@@ -263,14 +281,14 @@ export function advanceRun(
   if (next) {
     updated = { ...updated, currentStepId: next.id };
     setState({ ...state, run: updated });
-    flash(next.id, source);
+    flash(next.id, source, `${who(source)} completed step ${current.order}. Now at step ${next.order}: ${next.title}`);
   } else {
     updated = pushEvent({ ...updated, currentStepId: null, status: "completed", finishedAt: now() }, {
       kind: "completed",
       stepId: null,
     });
     setState({ ...state, run: updated });
-    flashRunbook();
+    flashRunbook(`${who(source)} completed step ${current.order}. The run is complete.`);
   }
   return { run: updated, next: next ?? null, previous: current };
 }
@@ -283,8 +301,7 @@ export function abandonRun(source: Source = "person") {
     { kind: "abandoned", stepId: run.currentStepId },
   );
   setState({ ...state, run: updated });
-  void source;
-  flashRunbook();
+  flashRunbook(`${who(source)} abandoned the run.`);
 }
 
 export function reportBlocker(stepId: string, note: string, source: Source = "person"): Blocker {
@@ -304,7 +321,7 @@ export function reportBlocker(stepId: string, note: string, source: Source = "pe
     nextRun = pushEvent(run, { kind: "blocked", stepId, note: blocker.note });
   }
   setState({ ...state, run: nextRun, blockers: [...state.blockers, blocker] });
-  flash(stepId, source);
+  flash(stepId, source, `${who(source)} reported a blocker on step ${step.order}: ${blocker.note}`);
   return blocker;
 }
 
@@ -333,8 +350,9 @@ export function applyBlockerFix(
     runbooks: state.runbooks.map((r) => (r.id === rb.id ? rb : r)),
     blockers: state.blockers.map((b) => (b.id === blockerId ? resolved : b)),
   });
-  flash(blocker.stepId, source);
-  return { blocker: resolved, step: ops.findStep(rb, blocker.stepId)! };
+  const fixed = ops.findStep(rb, blocker.stepId)!;
+  flash(blocker.stepId, source, `${who(source)} amended step ${fixed.order} from a blocker: ${fixed.title}`);
+  return { blocker: resolved, step: fixed };
 }
 
 export function dismissBlocker(blockerId: string) {

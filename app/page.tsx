@@ -6,6 +6,8 @@ import { Sidebar } from "@/components/Sidebar";
 export default function Home() {
   return (
     <main className="app">
+      <a className="skip-link" href="#run-heading">Skip to run controls</a>
+      <a className="skip-link" href="#harness-heading">Skip to agent harness</a>
       <WebMcpProvider />
       <header className="topbar">
         <div className="brand">

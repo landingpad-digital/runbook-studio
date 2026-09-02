@@ -61,6 +61,14 @@ export interface Highlight {
   /** Who made the change, so the UI can label it. */
   source: "person" | "agent";
   at: number;
+  /** Short sentence describing the change, for the badge and the live region. */
+  message: string;
+}
+
+export interface Announcement {
+  text: string;
+  /** Increments so that identical text is still re-announced. */
+  n: number;
 }
 
 export interface AppState {
@@ -69,4 +77,5 @@ export interface AppState {
   run: Run | null;
   blockers: Blocker[];
   highlight: Highlight | null;
+  announcement: Announcement | null;
 }

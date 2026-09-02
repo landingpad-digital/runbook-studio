@@ -139,7 +139,7 @@ export function HarnessPanel() {
   return (
     <section className="panel harness" aria-labelledby="harness-heading">
       <div className="harness-head">
-        <h2 id="harness-heading">Agent harness</h2>
+        <h2 id="harness-heading" tabIndex={-1}>Agent harness</h2>
         <p className="muted small-text">
           Discovers the page&apos;s tools with <code>getTools()</code> and runs them with <code>executeTool()</code>, exactly as an
           agent would. No model or browser flag needed.
