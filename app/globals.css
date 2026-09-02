@@ -294,7 +294,7 @@ pre {
 .step.skipped:hover, .step.skipped:focus-within { background: var(--surface-hover); }
 
 /* Run states: the only things that draw a box */
-.step.current { border-color: var(--accent); background: var(--accent-surface); }
+.step.current { border-width:2px; border-color: var(--accent); background: var(--accent-surface); }
 .step.done { border-left-color: var(--ok); }
 .step.done .step-body { opacity: 0.72; }
 .step.skipped { border-left-color: var(--line); background: var(--surface-skipped); }
@@ -395,7 +395,7 @@ pre {
 .panel-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); margin-bottom: 10px; flex-wrap: wrap; }
 .panel-head h2 { margin: 0; }
 .eyebrow { margin: 0 0 2px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); font-weight: 600; }
-.current-step { border: 1px solid var(--accent); border-left-width: 4px; border-radius: var(--radius); padding: 12px 14px; background: var(--accent-soft); }
+.current-step { border: 1px solid var(--accent); border-radius: var(--radius); padding: 12px 14px; background: var(--accent-soft); }
 .current-step h3 { margin: 0 0 6px; font-size: 17px; }
 .current-step p { margin: 0 0 var(--s2); }
 .check-line { font-size: 13.5px; }
