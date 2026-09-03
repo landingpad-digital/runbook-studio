@@ -30,7 +30,7 @@ The person and the agent also share the run. Either can advance a step, either c
 - **Lifecycle.** Registration passes an `AbortSignal`; unmounting aborts it and unregisters every tool. The execution-time `signal` is honoured when the browser supplies one, and treated as optional when it does not (Chrome 152 calls `execute` with a single argument).
 - **Shared state.** React and the tools share one small external store (`lib/store.ts`) persisted to `localStorage`. Tool calls and human edits are the same operations, so an agent change is reflected on the page instantly, with a highlight and a badge on the affected step, a change strip above the list, and a polite live-region announcement.
 - **Fallback.** If the browser has no native `document.modelContext`, the app installs `@mcp-b/webmcp-polyfill` so the built-in harness works in any modern browser. When the native API is present the polyfill is not installed.
-- **Harness.** `components/HarnessPanel.tsx` discovers tools with `getTools()` and runs them with `executeTool()`, the same calls an in-browser agent makes. It builds a form from each tool's `inputSchema` and logs every call and result.
+- **Harness.** `components/HarnessPanel.tsx` discovers tools with `getTools()` and runs them with `executeTool()`, the same calls an in-browser agent makes. It builds a form from each tool's `inputSchema` and logs every call and result. An optional model mode (`components/ModelInput.tsx` and `app/api/agent/route.ts`) lets a model choose the tool instead; see "Test it" below.
 - **Types.** `webmcp-types` from the WebMCP community group, plus a small local declaration for Chromium's `executeTool()`.
 
 ## Tools
@@ -63,7 +63,7 @@ The implementation follows the Chrome WebMCP security guidance:
 - **Annotations.** `readOnlyHint` is set on the read tools so an agent can decide when to confirm with the user. `untrustedContentHint` is set wherever user-written text (step instructions, blocker notes) is returned to the model, because that text can contain anything, including attempts at prompt injection.
 - **Origin.** `exposedTo` is left unset, so the tools are available only to the document that registered them. No cross-origin frame can call them.
 - **Validation.** Every argument is checked in the tool before it touches state. Unknown steps, missing required fields and invalid positions return a clear error rather than a partial change.
-- **No secrets, no network.** The app has no backend, no database and no API keys. Everything runs in the browser and persists to `localStorage`.
+- **No secrets in the core app.** The runbook, the tools and manual mode have no backend, no database and no API keys; everything runs in the browser and persists to `localStorage`. The optional model mode is the one server route, and it holds its key in an environment variable that is never committed.
 
 ## Run it locally
 
@@ -98,6 +98,20 @@ A good sequence to try on the default CRM example:
 3. `list_blockers`, then `apply_blocker_fix` with the blocker id and a corrected instruction.
 
 Step 5 is rewritten and the blocker is resolved.
+
+### With model mode (optional, needs your own key)
+
+The harness can also let a real model choose the tools. Type a sentence such as "Step 7 is too vague. Split it into two steps and add a check to each." and press Send. The browser sends the sentence and the output of `getTools()` to a small server route, an OpenAI-compatible model picks a tool, and the browser executes it through `document.modelContext.executeTool()`. The result goes back for the next turn until the model says it is done or six calls have been made. Every call lands in the same log as manual mode, marked "Model".
+
+Model mode needs an OpenAI-compatible endpoint and key, set as environment variables on the server:
+
+| Variable | Meaning |
+|---|---|
+| `MODEL_API_KEY` | Required. Without it the route reports "not configured" and the input is hidden, so a fresh clone runs in manual mode with no setup. |
+| `MODEL_BASE_URL` | Optional. Defaults to `https://api.deepinfra.com/v1/openai`. |
+| `MODEL_NAME` | Optional. Defaults to `deepseek-ai/DeepSeek-V4-Flash`. |
+
+Put them in a `.env` file next to `package.json` (it is gitignored) or pass them to the container. The route never executes a tool and never touches the page; it only returns the model's choice. Guardrails: six tool calls per message, a 500 character message limit, 400 output tokens, an in-memory limit of ten messages per hour per address, tool results passed to the model as data with a system prompt that forbids treating them as instructions, and `delete_step` refused unless the message itself asks to delete or remove a step.
 
 ### With a WebMCP-enabled browser
 

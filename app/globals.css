@@ -441,3 +441,12 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .credit p { margin: 0; }
 .credit a { color: var(--link-muted); text-decoration: underline; text-underline-offset: 2px; }
 .credit a:hover { color: var(--accent); }
+
+/* ------------------------------------------------------------------
+   Model mode input
+   ------------------------------------------------------------------ */
+.model-input { margin-bottom: var(--s4); padding-bottom: var(--s4); border-bottom: 1px solid var(--line); }
+.model-input .row { display: flex; gap: var(--s2); align-items: center; }
+.model-input .row input { flex: 1; }
+.model-input .row button { flex: 0 0 auto; }
+.model-input .hint { margin-top: 6px; }

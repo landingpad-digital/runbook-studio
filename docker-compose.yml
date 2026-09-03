@@ -10,6 +10,10 @@ services:
       - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=runbook.landingpad.digital
       - LETSENCRYPT_EMAIL=dev@landingpad.digital
+      # Model mode is optional. Leave MODEL_API_KEY empty and the harness stays in manual mode.
+      - MODEL_API_KEY=${MODEL_API_KEY:-}
+      - MODEL_BASE_URL=${MODEL_BASE_URL:-}
+      - MODEL_NAME=${MODEL_NAME:-}
     networks:
       - nextcloud-net
     restart: unless-stopped

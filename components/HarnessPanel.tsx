@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useWebMcpStatus } from "@/lib/webmcp-status";
+import { addLogEntry, prettyResult, useHarnessLog } from "@/lib/harness-log";
+import { ModelInput } from "./ModelInput";
 
 /**
  * Built-in agent harness. Discovers tools with document.modelContext.getTools()
@@ -23,24 +25,12 @@ interface InputSchema {
   required?: string[];
 }
 
-interface LogEntry {
-  id: number;
-  tool: string;
-  args: Record<string, unknown>;
-  result: string;
-  ok: boolean;
-  ms: number;
-  at: string;
-}
-
-let logCounter = 0;
-
 export function HarnessPanel() {
   const status = useWebMcpStatus();
   const [tools, setTools] = useState<WebMCP.RegisteredTool[]>([]);
   const [selected, setSelected] = useState<string>("");
   const [values, setValues] = useState<Record<string, string | boolean>>({});
-  const [log, setLog] = useState<LogEntry[]>([]);
+  const log = useHarnessLog();
   const [busy, setBusy] = useState(false);
   const [discoveryError, setDiscoveryError] = useState<string>("");
 
@@ -112,7 +102,7 @@ export function HarnessPanel() {
     let ok = true;
     try {
       const raw = await mc.executeTool(tool, JSON.stringify(args));
-      result = pretty(raw);
+      result = prettyResult(raw);
       try {
         const parsed = JSON.parse(raw ?? "");
         if (parsed && parsed.ok === false) ok = false;
@@ -125,10 +115,7 @@ export function HarnessPanel() {
     } finally {
       setBusy(false);
     }
-    setLog((l) => [
-      { id: ++logCounter, tool: tool.name, args, result, ok, ms: Math.round(performance.now() - started), at: new Date().toLocaleTimeString("en-GB") },
-      ...l,
-    ].slice(0, 30));
+    addLogEntry({ tool: tool.name, args, result, ok, ms: Math.round(performance.now() - started), source: "manual" });
   }
 
   const missingRequired = [...required].filter((k) => {
@@ -147,6 +134,8 @@ export function HarnessPanel() {
       </div>
 
       {discoveryError && <p className="error-text" role="alert">{discoveryError}</p>}
+
+      <ModelInput />
 
       <div className="field">
         <label htmlFor="harness-tool">Tool ({tools.length} registered)</label>
@@ -242,6 +231,7 @@ export function HarnessPanel() {
               <li key={entry.id} className={`log-entry ${entry.ok ? "ok" : "failed"}`}>
                 <div className="log-head">
                   <code>{entry.tool}</code>
+                  {entry.source === "model" && <span className="tag agent">Model</span>}
                   <span className="muted small-text">{entry.at}, {entry.ms} ms</span>
                 </div>
                 <details>
@@ -274,11 +264,3 @@ function parseSchema(raw: unknown): InputSchema {
   return raw as InputSchema;
 }
 
-function pretty(raw: string | null): string {
-  if (raw === null || raw === undefined) return "(no result)";
-  try {
-    return JSON.stringify(JSON.parse(raw), null, 2);
-  } catch {
-    return String(raw);
-  }
-}
