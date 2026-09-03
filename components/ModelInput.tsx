@@ -98,6 +98,7 @@ export function ModelInput() {
       }
     } finally {
       setPhase("idle");
+      setText("");
     }
   }
 
