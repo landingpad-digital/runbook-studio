@@ -167,10 +167,20 @@ export async function POST(req: Request) {
   const repeated = call?.name && last && last.name === call.name && (call.arguments ?? "{}") === JSON.stringify(last.args ?? {});
   const alreadyHasFullListing = transcript.some((t) => t.name === "list_steps" && /"instruction"/.test(String(t.result)));
   const redundantRead = call?.name === "get_step" && alreadyHasFullListing;
-  if (repeated || redundantRead) {
+  const mentionsBlocker = /\bblocker/i.test(message);
+  const hasListedBlockers = transcript.some((t) => t.name === "list_blockers");
+  const blockerFirst = mentionsBlocker && !hasListedBlockers && call?.name && call.name !== "list_blockers" && call.name !== "apply_blocker_fix";
+  const asksForChecks = /\bchecks?\b/i.test(message);
+  const setAnyCheck = transcript.some((t) => t.name === "set_check" || (t.name === "add_step" && typeof t.args?.check === "string" && t.args.check));
+  const finishedWithoutChecks = !call?.name && asksForChecks && transcript.length > 0 && !setAnyCheck;
+  if (repeated || redundantRead || blockerFirst || finishedWithoutChecks) {
     const note = repeated
       ? "You already made that exact call and its result is above. Do not repeat it. Make the next different call, or reply that you are done."
-      : "You already have every step in full from list_steps above, including the one you want to read. Do not call get_step. Make the change now with update_step, add_step, set_check, set_branch or apply_blocker_fix.";
+      : redundantRead
+        ? "You already have every step in full from list_steps above, including the one you want to read. Do not call get_step. Make the change now with update_step, add_step, set_check, set_branch or apply_blocker_fix."
+        : blockerFirst
+          ? "The person is asking about a blocker. Call list_blockers first; it tells you which step the blocker refers to and what was found. Then call get_step for that step and apply_blocker_fix."
+          : "The person asked for a check on each step you created or rewrote. Before finishing, call set_check for every such step that still has no check.";
     data = await complete([{ role: "system", content: note }]);
     if ("error" in data) return NextResponse.json({ error: data.error }, { status: data.status });
     msg = data.choices?.[0]?.message;
