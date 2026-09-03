@@ -133,6 +133,7 @@ export async function POST(req: Request) {
       },
     })),
     tool_choice: "auto",
+    temperature: 0.2,
     max_tokens: MAX_TOKENS,
   };
 
@@ -160,10 +161,17 @@ export async function POST(req: Request) {
   let msg = data.choices?.[0]?.message;
   let call = msg?.tool_calls?.[0]?.function;
 
-  // Models sometimes repeat the call they just made. Nudge once instead of burning a turn.
+  // Models sometimes repeat the call they just made, or re-read a step they already hold in full.
+  // Nudge once with a system note instead of burning one of the six turns.
   const last = transcript[transcript.length - 1];
-  if (call?.name && last && last.name === call.name && (call.arguments ?? "{}") === JSON.stringify(last.args ?? {})) {
-    data = await complete([{ role: "system", content: "You already made that exact call and its result is above. Do not repeat it. Make the next different call, or reply that you are done." }]);
+  const repeated = call?.name && last && last.name === call.name && (call.arguments ?? "{}") === JSON.stringify(last.args ?? {});
+  const alreadyHasFullListing = transcript.some((t) => t.name === "list_steps" && /"instruction"/.test(String(t.result)));
+  const redundantRead = call?.name === "get_step" && alreadyHasFullListing;
+  if (repeated || redundantRead) {
+    const note = repeated
+      ? "You already made that exact call and its result is above. Do not repeat it. Make the next different call, or reply that you are done."
+      : "You already have every step in full from list_steps above, including the one you want to read. Do not call get_step. Make the change now with update_step, add_step, set_check, set_branch or apply_blocker_fix.";
+    data = await complete([{ role: "system", content: note }]);
     if ("error" in data) return NextResponse.json({ error: data.error }, { status: data.status });
     msg = data.choices?.[0]?.message;
     call = msg?.tool_calls?.[0]?.function;
